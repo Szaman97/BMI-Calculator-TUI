@@ -1,3 +1,7 @@
+////przykladowa zmiana
+
+
+
 package app;
 
 import com.googlecode.lanterna.gui2.BasicWindow;
