@@ -32,7 +32,7 @@ import java.io.IOException;
 
 public class BMI_calc_TUI_MichalGlogowski_AlicjaBadower {
 	
-	//Private static fields containing weight and height typed by the user (with '_s' there are Strings, with '_d' double numbers)
+	//Private static fields containing weight, height and nick typed by the user (with '_s' there are Strings, with '_d' double numbers)
 	//BMI - field for result of the calculations
 	private static String weight_s = "";
 	private static String height_s = "";
@@ -42,8 +42,8 @@ public class BMI_calc_TUI_MichalGlogowski_AlicjaBadower {
 	private static double height_d = 0;
 	private static double BMI = 0;
 	
-	//String fields used for correctly formatting text that will be send to file
-	//Further it will be added some '\t' characters, depending on size of texts
+	//String fields used for correctly formatting text sending to file
+	//'\t' characters are adding, depending on size of texts
 	private static String tabNick = "";
 	private static String tabBMI = "";
 	private static String tabWeight = "";
