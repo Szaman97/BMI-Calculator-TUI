@@ -26,11 +26,20 @@ import java.io.IOException;
 /**
  * BMI Calculator
  * @author Micha³ G³ogowski, Alicja Badower
- * @version 0.2
+ * @version 0.2.1
+ * License: MIT
  * Program requires additional libraries - lanterna 3.0.0
  */
 
 public class BMI_calc_TUI_MichalGlogowski_AlicjaBadower {
+	
+	private static String version = "0.2.1";
+	
+	//Private static fields containing necessary components of the window
+	private static Screen screen = null;
+	private static WindowBasedTextGUI textGUI = null;
+	private static Window window = null;
+	private static Panel contentPanel = null;
 	
 	//Private static fields containing weight, height and nick typed by the user (with '_s' there are Strings, with '_d' double numbers)
 	//BMI - field for result of the calculations
@@ -52,7 +61,7 @@ public class BMI_calc_TUI_MichalGlogowski_AlicjaBadower {
 	private static File file = new File("data.txt");
 	
 	/**
-	 * Private method responsible for parsing strings to doubles, calculating BMI, rounding double variables to two digits after the comma
+	 * Method responsible for parsing strings to doubles, calculating BMI, rounding double variables to two digits after the comma
 	 * and saving it to strings to further file operations 
 	 * @param weight string should contain weight that will be parsed to double
 	 * @param height string should contain height that will be parsed to double
@@ -82,7 +91,7 @@ public class BMI_calc_TUI_MichalGlogowski_AlicjaBadower {
 	}
 	
 	/**
-	 * Private method responsible for rounding double numbers up to 2 digits after comma
+	 * Method responsible for rounding double numbers up to 2 digits after comma
 	 * @param arg number to round
 	 * @return number rounded up to two digits after comma
 	 */
@@ -95,8 +104,8 @@ public class BMI_calc_TUI_MichalGlogowski_AlicjaBadower {
 	}
 	
 	/**
-	 * Private method responsible for adding empty line in the Panel
-	 * @param x is a content panel which will store all components
+	 * Method responsible for adding empty line in the Panel
+	 * @param x is a content panel the line will be added to
 	 */
 	private static void addEmptyLine(Panel x)
 	{
@@ -104,27 +113,27 @@ public class BMI_calc_TUI_MichalGlogowski_AlicjaBadower {
 	}
 	
 	/**
-	 * Private method responsible for checking BMI and returning correct description
+	 * Method responsible for checking BMI and returning correct description
 	 * @param bmi is a calculated value of Body Mass Index which decides what should be returned
 	 * @return text depends on BMI value
 	 */
 	private static String selectCategory()
 	{
 		String text;
-		if(BMI<15) {text = "Very severely underweight";}
-		else if(BMI<16) {text = "Severely underweight";}
-		else if(BMI<18.5) {text = "Underweight";}
-		else if(BMI<25) {text = "Normal (healthy weight)";}
-		else if(BMI<30) {text = "Overweight";}
-		else if(BMI<35) {text = "Obese Class I (Moderately obese)";}
-		else if(BMI<40) {text = "Obese Class II (Severely obese)";}
-		else {text = "Obese Class III (Very severely obese)";}
+		if(BMI<15) text = "Very severely underweight";
+		else if(BMI<16) text = "Severely underweight";
+		else if(BMI<18.5) text = "Underweight";
+		else if(BMI<25) text = "Normal (healthy weight)";
+		else if(BMI<30) text = "Overweight";
+		else if(BMI<35) text = "Obese Class I (Moderately obese)";
+		else if(BMI<40) text = "Obese Class II (Severely obese)";
+		else text = "Obese Class III (Very severely obese)";
 		
 		return text;
 	}
 	
 	/**
-	 * Private method responsible for checking String if it contains comma instead of dot.
+	 * Method responsible for checking String if it contains comma instead of dot.
 	 * When there is comma, commaToDot changes it to dot allowing parsing that string to double.
 	 * @param s string to check
 	 * @return string with dot instead of comma
@@ -135,7 +144,7 @@ public class BMI_calc_TUI_MichalGlogowski_AlicjaBadower {
 	}
 	
 	/**
-	 * Private method responsible for calculating needed amount of '\t' characters for correctly displaying text
+	 * Method responsible for calculating needed amount of '\t' characters for correctly displaying text
 	 */
 	private static void calcTabs()
 	{
@@ -149,20 +158,73 @@ public class BMI_calc_TUI_MichalGlogowski_AlicjaBadower {
 		if(weight_s.length()<4) tabWeight += "\t";
 	}
 	
+	/**
+	 * Method responsible for saving results to file
+	 */
+	private static void saveToFile()
+	{
+		try
+		{
+    		FileWriter out = new FileWriter(file,true);	//the second argument allows to append text to existing file
+    		out.write(nick_s + tabNick);
+    		out.write(BMI_s + tabBMI);
+    		out.write(weight_s + tabWeight);
+    		out.write(height_s + "\r\n");	//add entry to next line
+    		out.close();					//flush and close the stream
+		}
+		catch(IOException e)
+		{
+			MessageDialog.showMessageDialog(textGUI, "File error", "Save to file was not possible", MessageDialogButton.OK);
+		}
+	}
+	
+	/**
+	 * Method responsible for loading and displaying data from file
+	 */
+	private static void loadAndDisplay()
+	{
+		 try
+		 {
+			 FileReader in = new FileReader(file);
+			 
+			 //BufferedReader created to load lines of text instead of simple characters
+			 BufferedReader buffReader = new BufferedReader(in);
+			 
+			 //Local variables to keep read text from file
+			 String fileText = "";
+			 String line = "";
+			 
+			 //Do until EOF is not reached (specified by returning null by method readLine)
+			 while( (line = buffReader.readLine()) != null)
+			 {
+				 fileText += line + "\r\n";
+			 }
+			 
+			 buffReader.close();
+			 in.close();
+			 
+			 //Added 7 spaces before \r\n due to lanterna issue - it does not count special characters to Dialog size calculations
+   		 MessageDialog.showMessageDialog(textGUI, "Saved data", "Name\t\tBMI     Weight\tHeight       \r\n" + fileText, MessageDialogButton.OK);
+		 }
+		 catch(IOException e)
+		 {
+			 MessageDialog.showMessageDialog(textGUI, "File error", "Could not load the file", MessageDialogButton.OK);
+		 }
+	}
+	
 	public static void main(String[] args) {
 		
 		DefaultTerminalFactory terminalFactory = new DefaultTerminalFactory();
-        Screen screen = null;
-        
+
         try
         {
         	screen = terminalFactory.createScreen();
             screen.startScreen();
-            final WindowBasedTextGUI textGUI = new MultiWindowTextGUI(screen);
-            final Window window = new BasicWindow("BMI Calculator");
+            textGUI = new MultiWindowTextGUI(screen);
+            window = new BasicWindow("BMI Calculator");
             
             //Panel holding components of the window - it has 2 columns
-            Panel contentPanel = new Panel(new GridLayout(2));
+            contentPanel = new Panel(new GridLayout(2));
             
             //Making space between the columns
             GridLayout gridLayout = (GridLayout)contentPanel.getLayoutManager();
@@ -203,8 +265,8 @@ public class BMI_calc_TUI_MichalGlogowski_AlicjaBadower {
             contentPanel.addComponent(new Button("Calculate", new Runnable() 
             {
                 @Override
-                public void run() {
-                	
+                public void run()
+                {
                 	//Parsing may throw NumberFormatException in case that text in TextBox wont be possible to change to double
                 	try
                 	{
@@ -224,19 +286,7 @@ public class BMI_calc_TUI_MichalGlogowski_AlicjaBadower {
                 		calcTabs();
                 		
                 		//Save to file
-                		try
-                		{
-                    		FileWriter out = new FileWriter(file,true);	//the second argument allows to append text to existing file
-                    		out.write(nick_s + tabNick);
-                    		out.write(BMI_s + tabBMI);
-                    		out.write(weight_s + tabWeight);
-                    		out.write(height_s + "\r\n");	//add entry to next line
-                    		out.close();					//flush and close the stream
-                		}
-                		catch(IOException e)
-                		{
-                			MessageDialog.showMessageDialog(textGUI, "File error", "Save to file was not possible", MessageDialogButton.OK);
-                		}
+                		saveToFile();
                 		
                         MessageDialog.showMessageDialog(textGUI, "BMI", "Calculated BMI: " + BMI + "\n" + selectCategory(), MessageDialogButton.OK);
                 	}
@@ -244,9 +294,6 @@ public class BMI_calc_TUI_MichalGlogowski_AlicjaBadower {
                 	{
                 		MessageDialog.showMessageDialog(textGUI, "ERROR", "NumberFormatException:\n" + "Please check if the fields are correctly filled", MessageDialogButton.OK);
                 	}
-                	
-                	
-                	
                 }
             }).setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.CENTER, GridLayout.Alignment.CENTER)));
             
@@ -256,33 +303,7 @@ public class BMI_calc_TUI_MichalGlogowski_AlicjaBadower {
             	 @Override
                  public void run()
                  {
-            		 try
-            		 {
-            			 FileReader in = new FileReader(file);
-            			 
-            			 //BufferedReader created to load lines of text instead of simple characters
-            			 BufferedReader buffReader = new BufferedReader(in);
-            			 
-            			 //Local variables to keep read text from file
-            			 String fileText = "";
-            			 String line = "";
-            			 
-            			 //Do until EOF is not reached (specified by returning null by method readLine)
-            			 while( (line = buffReader.readLine()) != null)
-            			 {
-            				 fileText += line + "\r\n";
-            			 }
-            			 
-            			 buffReader.close();
-            			 in.close();
-            			 
-            			 //Added 7 spaces before \r\n due to lanterna issue - it does not count special characters to Dialog size calculations
-                		 MessageDialog.showMessageDialog(textGUI, "Saved data", "Name\t\tBMI     Weight\tHeight       \r\n" + fileText, MessageDialogButton.OK);
-            		 }
-            		 catch(IOException e)
-            		 {
-            			 MessageDialog.showMessageDialog(textGUI, "File error", "Could not load the file", MessageDialogButton.OK);
-            		 }
+            		 loadAndDisplay();
                  }
             }).setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.CENTER, GridLayout.Alignment.CENTER)));
             
@@ -297,7 +318,7 @@ public class BMI_calc_TUI_MichalGlogowski_AlicjaBadower {
                         @Override
                         public void run() 
                         {
-                        	MessageDialog.showMessageDialog(textGUI, "BMI Calculator v0.2", "Created by:\nMicha³ G³ogowski\nAlicja Badower", MessageDialogButton.OK);
+                        	MessageDialog.showMessageDialog(textGUI, "BMI Calculator v" + version, "Created by:\nMicha³ G³ogowski\nAlicja Badower", MessageDialogButton.OK);
                         }
                     }).setLayoutData(GridLayout.createHorizontallyEndAlignedLayoutData(2)));
             
@@ -313,11 +334,10 @@ public class BMI_calc_TUI_MichalGlogowski_AlicjaBadower {
                     }).setLayoutData(GridLayout.createHorizontallyEndAlignedLayoutData(2)));
             
             
-            //Attach panel to the window
+            //Attach contentPanel to the window
             window.setComponent(contentPanel);
             
-            textGUI.addWindowAndWait(window);
-              
+            textGUI.addWindowAndWait(window);  
         }
         catch (IOException e) 
         {
